@@ -262,6 +262,7 @@ function skapaprov()
   function test_phonegap() {
     if(confirm('testa phonegap?')) {
 	    alert('testar...'); 
+
 	    if(!navigator) 
 	      alert('saknar navigator'); 
 	    else if(!navigator.notification) 
@@ -270,6 +271,15 @@ function skapaprov()
 	      alert('saknar alert'); 
 	    else 
 	      navigator.notification.alert('Popup from phonegap', test_phonegap_ok, 'Test popup', 'C2!');
+
+	    if(!device) 
+	      alert('saknar device'); 
+	    else {
+	      alert('Phonegap uuid: '+device.uuid);
+	      alert('Phonegap name: '+device.name);
+	      alert('Phonegap platform: '+device.platform);
+		}
+
 	    alert('...testat');
     }
   }
