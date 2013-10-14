@@ -324,7 +324,7 @@ function skapaprov()
     else if(!navigator.geolocation.getCurrentPosition) 
       alert('saknar getCurrentPosition'); 
     else 
-	  navigator.geolocation.getCurrentPosition(test_gps_onSuccess, test_gps_onSuccessonError);
+	  navigator.geolocation.getCurrentPosition(test_gps_onSuccess, test_gps_onError);
 
     alert('...testat GPS');
   }
