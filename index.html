@@ -7,6 +7,7 @@
 <link rel=stylesheet href="http://code.jquery.com/mobile/1.1.2/jquery.mobile-1.1.2.min.css">
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.1.2/jquery.mobile-1.1.2.min.js"></script>
+<script src="phonegap.js"></script>
 
 <script>
 $.mobile.page.prototype.options.backBtnText = 'Åter';
@@ -256,6 +257,8 @@ function skapaprov()
   Lite slutlig info...<br>
   <a href="javascript:test_phonegap()">Testa phonegap</a><br>
   <script>
+  function test_phonegap_ok() {
+  }
   function test_phonegap() {
     if(confirm('testa phonegap?')) {
 	    alert('testar...'); 
@@ -266,7 +269,7 @@ function skapaprov()
 	    else if(!navigator.notification.alert) 
 	      alert('saknar alert'); 
 	    else 
-	      navigator.notification.alert('Popup from phonegap', null);
+	      navigator.notification.alert('Popup from phonegap', test_phonegap_ok, 'Test popup', 'C2!');
 	    alert('...testat');
     }
   }
