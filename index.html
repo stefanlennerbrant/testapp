@@ -254,7 +254,9 @@ function skapaprov()
   Lite info...<br>
   Lite mer info...<br>
   Lite slutlig info...<br>
+  <a href="javascript:test_phonegap()">Testa phonegap</a><br>
   <script>
+  function test_phonegap() {
     if(confirm('testa phonegap?')) {
 	    alert('testar...'); 
 	    if(!navigator) 
@@ -267,6 +269,7 @@ function skapaprov()
 	      navigator.notification.alert('Popup from phonegap', null);
 	    alert('...testat');
     }
+  }
   </script>
 </div>
 </div>
