@@ -260,10 +260,14 @@ function skapaprov()
   <a href="https://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm">Test extern https</a><br>
   <a href="javascript:test_phonegap_extern('http://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm')">Test windowopen http</a><br>
   <a href="javascript:test_phonegap_extern('https://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm')">Test windowopen https</a><br>
+  <a href="javascript:test_phonegap_externsimple('https://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm')">Test windowopen simple</a><br>
   <a href="javascript:test_phonegap()">Test lokalt</a><br>
   <script>
   function test_phonegap_extern(sida) {
-    window.open('', sida);
+    window.open(sida,'externtest','width=300,height=400,scrollbars=yes,resizable=yes');
+  }
+  function test_phonegap_externsimple(sida) {
+    window.open(sida);
   }
   function test_phonegap_ok() {
   }
