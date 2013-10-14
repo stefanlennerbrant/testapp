@@ -37,6 +37,7 @@
 
     <gap:plugin name="org.apache.cordova.core.dialogs" />
     <gap:plugin name="org.apache.cordova.core.device" />
+	<gap:plugin name="org.apache.cordova.core.geolocation" />
 
     <!-- Define app icon for each platform. -->
     <icon src="icon.png" />

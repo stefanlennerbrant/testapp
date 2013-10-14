@@ -256,6 +256,7 @@ function skapaprov()
   Lite mer info...<br>
   Lite slutlig info...<br>
   <a href="javascript:test_phonegap()">Testa phonegap</a><br><br>
+  <a href="javascript:test_gps()">Testa GPS</a><br><br>
   <a href="http://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm">Test extern http</a><br><br>
   <a href="https://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm">Test extern https</a><br><br>
   <a href="javascript:test_phonegap_extern('http://systemc2.c2management.se/test/phonegapbuilds/Stefan/externtest.htm')">Test windowopen http</a><br><br>
@@ -268,6 +269,7 @@ function skapaprov()
   function test_phonegap_externsimple(sida) {
     window.open(sida);
   }
+
   function test_phonegap_ok() {
   }
   function test_phonegap() {
@@ -293,6 +295,38 @@ function skapaprov()
 
 	    alert('...testat');
     }
+  }
+
+  function test_gps() {
+    alert('testar GPS...');
+
+	function test_gps_onSuccess(position) {
+	    alert('GPS result\n'+
+	          'Latitude: '          + position.coords.latitude          + '\n' +
+	          'Longitude: '         + position.coords.longitude         + '\n' +
+	          'Altitude: '          + position.coords.altitude          + '\n' +
+	          'Accuracy: '          + position.coords.accuracy          + '\n' +
+	          'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+	          'Heading: '           + position.coords.heading           + '\n' +
+	          'Speed: '             + position.coords.speed             + '\n' +
+	          'Timestamp: '         + position.timestamp                + '\n');
+    }
+	function test_gps_onError(error) {
+	    alert('GPS error\n'+
+	          'code: '    + error.code    + '\n' +
+	          'message: ' + error.message + '\n');
+	}
+
+    if(!navigator) 
+      alert('saknar navigator'); 
+    else if(!navigator.geolocation) 
+      alert('saknar geolocation'); 
+    else if(!navigator.geolocation.getCurrentPosition) 
+      alert('saknar getCurrentPosition'); 
+    else 
+	  navigator.geolocation.getCurrentPosition(test_gps_onSuccess, test_gps_onSuccessonError);
+
+    alert('...testat GPS');
   }
   </script>
 </div>
