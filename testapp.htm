@@ -1,0 +1,277 @@
+<!doctype html>
+<html>
+<head>
+<meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content=yes>
+<title>Testbolaget provsvar</title>
+<link rel=stylesheet href="http://code.jquery.com/mobile/1.1.2/jquery.mobile-1.1.2.min.css">
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.1.2/jquery.mobile-1.1.2.min.js"></script>
+
+<script>
+$.mobile.page.prototype.options.backBtnText = 'Åter';
+
+function provresultat(provnr, provkod)
+{
+  var result = Math.floor((Math.random() * 9));
+  if(result == 0)
+    return('Inkommet, ännu ej behandlat');
+  else if(result == 1)
+    return('Utredning pågår');
+  else if(result == 2)
+    return('Analys pågår');
+  else if(result == 3)
+    return('Analys klar, ingen kontanimering kunde detekteras');
+  else if(result == 4)
+    return('Analys klar, svag kontanimering identifierad');
+  else if(result == 5)
+    return('Analys klar, svår kontanimering identifierad');
+  else if(result == 6)
+    return('Analys klar, AKUT kontanimering. Ärendet är eskalerat.');
+  else if(result == 7)
+    return('Provmaterialet är bristfälligt. Nytt prov begärt');
+  else if(result == 8)
+    return(null);
+}
+function uppdatera_data()
+{
+  var i;
+  var ant;
+  var provdata;
+  var provlista = Array();
+  var nyprovlista = Array();
+
+  provdata = localStorage['C2_TestBolaget_provlista'];
+//alert('DEBUG:get '+provdata);
+  if(provdata && provdata.length) {
+    provlista = JSON.parse(localStorage['C2_TestBolaget_provlista']);
+    for(i = 0; i < provlista.length; i++) {
+      provlista[i]['resultat'] = provresultat(provlista[i]['provnr'], provlista[i]['provkod']);
+      if(!provlista[i]['resultat']) {
+        provlista[i]['resultat'] = 'Provet återfinns ej';
+        provlista[i]['uppdat_d'] = 0;
+      }
+      else {
+        var date = new Date();
+        provlista[i]['uppdat_d'] = date.getTime() / 1000;
+      }
+      nyprovlista.push(provlista[i]);
+    }
+//alert('DEBUG:set '+JSON.stringify(nyprovlista));
+    localStorage.setItem('C2_TestBolaget_provlista', JSON.stringify(nyprovlista));
+    uppdatera_lista();
+  }
+}
+
+function uppdatera_lista()
+{
+  var i;
+  var ant;
+  var provdata;
+  var provlista = Array();
+
+  $('#provlista').empty();
+
+  ant = 0;
+//alert('DEBUG:get '+localStorage['C2_TestBolaget_provlista']);
+  provdata = localStorage['C2_TestBolaget_provlista'];
+  if(provdata && provdata.length) {
+    provlista = JSON.parse(provdata);
+    for(i = 0; i < provlista.length; i++) {
+      ant++;
+      $('#provlista').append('<li><a target=_blank href="https://systemc2.c2management.se/c2/Db15.Mobil/c2app/?LOGIN=Provhantering&HANDLE=Hantera&HANDLEPARAM=TYP=1;KLASS1='+provlista[i]['provnr']+';KLASS1B='+provlista[i]['provkod']+'"><h1>Provnummer: '+provlista[i]['provnr']+'</h1>'+'<p><b>Resultat:</b> '+(provlista[i]['resultat'] ? provlista[i]['resultat'] : '<i>Ej uppdaterat</i>')+'<br>'+getdatumtid('Uppdaterad', provlista[i]['uppdat_d'])+getdatumtid('Skapad', provlista[i]['skapad_d'])+'</p></a><a href="javascript:radera_lista(\''+provlista[i]['provnr']+'\')">Radera provet</a></li>');
+    }
+  }
+
+  if(ant == 0)
+    $('#provlista').append('<li>Inga prover bevakas</li>');
+
+  $('#provlista').listview('refresh');
+}
+
+function skapa_lista(provnr, provkod)
+{
+  var i;
+  var hasprov;
+  var skapad_d;
+  var uppdat_d;
+  var provlista = Array();
+
+  hasprov = false;
+  provdata = localStorage['C2_TestBolaget_provlista'];
+//alert('DEBUG:get '+provdata);
+  if(provdata && provdata.length) {
+    provlista = JSON.parse(provdata);
+    for(i = 0; !hasprov && i < provlista.length; i++) {
+      if(provlista[i]['provnr'] == provnr)
+        hasprov = true;
+    }
+  }
+  if(hasprov)
+    alert('Provet fanns redan i listan');
+  else {
+    var date = new Date();
+    skapad_d = date.getTime() / 1000;
+    resultat = provresultat(provnr, provkod);
+    if(!resultat) {
+      resultat = 'Provet återfinns ej';
+      uppdat_d = 0;
+    }
+    else {
+      date = new Date();
+      uppdat_d = date.getTime() / 1000;
+    }
+    provlista.push({provnr:provnr, provkod:provkod, skapad_d:skapad_d, resultat:resultat, uppdat_d:uppdat_d});
+//alert('DEBUG:set '+JSON.stringify(provlista));
+    localStorage.setItem('C2_TestBolaget_provlista', JSON.stringify(provlista));
+    uppdatera_lista();
+  }
+}
+
+function radera_lista(provnr)
+{
+  var i;
+  var provlista = Array();
+  var nyprovlista = Array();
+
+  if(confirm('Vill du radera bevakningen av prov '+provnr+'?')) {
+//alert('DEBUG:get '+localStorage['C2_TestBolaget_provlista']);
+    provlista = JSON.parse(localStorage['C2_TestBolaget_provlista']);
+    for(i = 0; i < provlista.length; i++) {
+      if(provlista[i]['provnr'] != provnr)
+        nyprovlista.push(provlista[i]);
+    }
+//alert('DEBUG:set '+JSON.stringify(nyprovlista));
+    localStorage.setItem('C2_TestBolaget_provlista', JSON.stringify(nyprovlista));
+    uppdatera_lista();
+  }
+}
+
+function getdatumtid(text, datumtid)
+{
+//alert(text+':'+datumtid);
+  if(datumtid <= 0)
+    datumtid = 'uppgift saknas';
+  else {
+    var date = new Date();
+    datumtid = date.getTime() / 1000 - datumtid;
+    if(datumtid < 60)
+      datumtid = Math.floor(datumtid)+' sek';
+    else if(datumtid < 3600)
+      datumtid = Math.floor(datumtid/60)+' min';
+    else if(datumtid < 86400)
+      datumtid = Math.floor(datumtid/3600)+' tim';
+    else
+      datumtid = Math.floor(datumtid/86400)+' dagar';
+  }
+  return ' <i>('+text+': '+datumtid+')</i>';
+}
+</script>
+</head>
+<body>
+
+<div data-role=page id=start style="background-color:#ffffff; background-image:url('start.png'); background-repeat:no-repeat; background-position:center; background-size:contain;">
+<div data-role=content>
+  <div style="position:absolute; top:50%; left:50%; margin-top:-2em; margin-left:-8em;">
+    <a href="#prov" data-role=button style="width:15em">Starta</a>
+    <a href="#slut" data-role=button style="width:15em">Avsluta</a>
+  </div>
+</div>
+</div>
+
+<div data-role=page id=prov>
+<div data-role=header>
+  <h1>Mina prover</h1>
+  <a href="#info" data-role=button class="ui-btn-right">Hjälp</a>
+</div>
+<div data-role=content>
+  <div>
+    <a href="#nyttprov" data-role=button data-icon=plus style="width:15em">Ny bevakning</a>
+  </div>
+  <ul data-role=listview data-inset=true data-split-icon=delete id=provlista data-theme=z>
+  </ul>
+</div>
+<div data-role=footer data-position=fixed>
+  <div data-role=navbar>
+    <ul>
+      <li><a data-icon="refresh" href="javascript:uppdatera_data();">Uppdatera</a></li>
+      <li><a data-icon="home" href="https://systemc2.c2management.se/c2/Db15.Mobil/c2app/?LOGIN=Provhantering">Provsystemet</a></li>
+      <li><a href="#slut">Avsluta</a></li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div data-role=page id=nyttprov data-add-back-btn=true>
+<div data-role=header>
+  <h1>Bevaka prov</h1>
+  <a href="#info" data-role=button class="ui-btn-right">Hjälp</a>
+</div>
+<div data-role=content>
+<script>
+function skapaprov()
+{
+  var test_provnr = /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/;
+  var test_provkod = /^[A-Z][A-Z][A-Z][A-Z]/;
+
+  $('#nyprovkod').val($('#nyprovkod').val().toUpperCase());
+
+  if(!$('#nyprovnr').val().match(test_provnr)) {
+    $('#nyprovnr').focus();
+    alert('Felaktigt provnummer');
+  }
+  else if(!$('#nyprovkod').val().match(test_provkod)) {
+    $('#nyprovkod').focus();
+    alert('Felaktig kod');
+  }
+  else {
+    skapa_lista($('#nyprovnr').val(), $('#nyprovkod').val());
+    $.mobile.changePage('#prov');
+    $('#nyprovnr').val('');
+    $('#nyprovkod').val('');
+  }
+}
+</script>
+  <div data-role=fieldcontain>
+    <label for=nyprovnr>Provnummer:</label>
+    <input type=number maxlength=10 name=nyprovnr id=nyprovnr style="width:15em" value="" placeholder="Ange provnummer, 10 siffror"/>
+  </div>
+  <div data-role=fieldcontain>
+    <label for=nyprovkod>Kod:</label>
+    <input type=text maxlength=4 name=nyprovkod id=nyprovkod style="width:15em" value="" placeholder="Ange kod, 4 bokstäver"/>
+  </div>
+  <div data-role=fieldcontain>
+    <a href="javascript:skapaprov()" data-role=button style="width:15em">Lägg till</a>
+  </div>
+</div>
+</div>
+
+<div data-role=page id=info data-add-back-btn=true>
+<div data-role=header>
+  <h1>Hjälp och information</h1>
+</div>
+<div data-role=content>
+  Lite info...<br>
+  Lite mer info...<br>
+  Lite slutlig info...<br>
+</div>
+</div>
+
+<div data-role=page id=slut style="background-color:#ffffff;">
+<div data-role=content>
+  <div style="position:absolute; top:50%; left:50%; margin-top:-2em; margin-left:-10em;">
+    <div style="width:20em; text-align:center">Tack för besöket!</div>
+    <br>
+    <a href="https://systemc2.c2management.se/c2/Db15.Mobil/c2app/?LOGIN=Provhantering" data-role=button style="width:20em">Starta provsystemet</a>
+  </div>
+</div>
+</div>
+
+<script>
+$('#prov').bind('pageinit', function() {
+  uppdatera_lista();
+});
+</script>
+
+</body>
+</html>
